@@ -18,8 +18,8 @@
 <body onload="init()">
     <script> 
         const urls = [
-        "https://YungBulgaria.github.io/smaller_data_part_1.csv",
-        "https://YungBulgaria.github.io/smaller_data_part_2.csv"
+        "https://YungBulgaria.github.io/Data/medium_data1.csv",
+        "https://YungBulgaria.github.io/Data/medium_data2.csv"
         ]
         async function init() {
             let allData = []
@@ -27,6 +27,7 @@
                 const data = await d3.csv(url)
                 allData = allData.concat(data)
             }
+            console.log(allData);
             
             d3.select('body')
             .selectAll('p')

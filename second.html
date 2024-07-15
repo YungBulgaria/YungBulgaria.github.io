@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <title>
         Second page
     </title>
@@ -13,5 +14,19 @@
     
         <button onclick="window.location.href='index.html'"> Go back to main page </button>
     </body>
+
+<body onload="init()">
+    <script>
+        async function init() {
+            const data = await d3.csv('https://YungBulgaria.github.io/US_Accidents_March23.csv');
+            d3.select('body')
+            .selectAll('p')
+            .data(data)
+            .enter()
+            .append('p')
+            .html(function(d,i) {return 'item ' + d.item + ' is ' + d.number + '.'});
+        }
+    </script>
+</body>
     
 </html>

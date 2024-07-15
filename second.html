@@ -27,14 +27,14 @@
                 const data = await d3.csv(url)
                 allData = allData.concat(data)
             }
-            console.log(allData);
+            
             
             d3.select('body')
             .selectAll('p')
             .data(allData)
             .enter()
             .append('p')
-            .html(function(d,i) {return 'item ' + d.item + ' is ' + d.number + '.'});
+            .html(function(d,i) {return 'item ' + d.ID + ' is ' + d.Severity + '.'});
         }
     </script>
 </body>

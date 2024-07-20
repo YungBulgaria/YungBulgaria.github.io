@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
+    <style>
+        .circle-2 { fill: lightcoral; stroke: black; }
+        .circle-3 { fill: lightseagreen; stroke: black; }
+        .circle-4 { fill: rebeccapurple; stroke: black; }
+        .circle-6 { fill: steelblue; stroke: black; }
+        .circle-8 { fill: tomato; stroke: black; }
+        .circle-10 { fill: gold; stroke: black; }
+        .circle-12 { fill: darkorange; stroke: black; }
+        .button-container { text-align: center; margin-top: 20px; }
+        button { padding: 10px 20px; margin: 5px; font-size: 16px; }
+        select { padding: 10px; margin: 5px; font-size: 16px; }
+        h2 { text-align: center; }
+        #tooltip {
+            opacity: 0;
+            position: absolute;
+            text-align: center;
+            width: 140px; height: 90px;
+            background: white;
+            border: 2px solid black;
+        }
+        #help-text { text-align: left; }
+        ul { display: inline-block; text-align: left; margin-bottom: 20px; }
+    </style>
+    <body onload="init()">
+        <h2 id="title">8 cylinders</h2>
+        <div class="button-container">
+            <button id="home" onclick="window.location.href='index.html'">Home</button>
+            <button id="prev">Previous</button>
+            <button id="next">Next</button>
+            <select id="cylinderSelect" style="display: none;">
+                <option value="all">All</option>
+                <option value="2">2 cylinders</option>
+                <option value="3">3 cylinders</option>
+                <option value="4">4 cylinders</option>
+                <option value="6">6 cylinders</option>
+                <option value="8">8 cylinders</option>
+                <option value="10">10 cylinders</option>
+                <option value="12">12 cylinders</option>
+            </select>
+        </div>
+        <div id="tooltip"></div>
+        <svg width="1200" height="605"></svg>
+        <div id="help-text">
+            <ul> 
+                <li> Hover over any point to see more information on it. </li> 
+                <li> Move between engine cylinders with the next and previous buttons.</li>
+            </ul>
+        </div>
+        <script>
+            async function init() {
+                const margin = { top: 50, right: 30, bottom: 30, left: 50 };
+                const width = 1200 - margin.left - margin.right;
+                const height = 600 - margin.top - margin.bottom;
+
+                const data = await d3.csv("https://flunky.github.io/cars2017.csv");
+                const filteredData = data.filter(d => +d["EngineCylinders"] !== 0);
+
+                const svg = d3.select("svg").append("g").attr("transform", "translate(50,50)");
+
+                const scaleX = d3.scaleLinear().domain([0, 50]).range([0, width]);
+                const scaleY = d3.scaleLinear().domain([0, 50]).range([height, 0]);
+
+                const xAxis = d3.axisBottom(scaleX).tickValues([0, 10, 20, 30, 40, 50]).tickFormat(d3.format("~s"));
+                const yAxis = d3.axisLeft(scaleY).tickValues([0, 10, 20, 30, 40, 50]).tickFormat(d3.format("~s"));
+
+                svg.append("g").call(yAxis);
+                svg.append("text").attr("text-anchor", "middle").attr("x", width/2).attr("y", height + 30).text("AverageCityMPG")
+                svg.append("g").attr("transform", "translate(0,520)").call(xAxis);
+                svg.append("text").attr("text-anchor", "middle").attr("x", -height/2).attr("y", -30).attr("transform", "rotate(-90)").text("AverageHighwayMPG");
+
+                const cylinders = [8, 6, 4];
+                let currentIndex = 0;
+                let currentCyl = 8;
+
+                const colorClassMap = {
+                    2: 'circle-2',
+                    3: 'circle-3',
+                    4: 'circle-4',
+                    6: 'circle-6',
+                    8: 'circle-8',
+                    10: 'circle-10',
+                    12: 'circle-12'
+                };
+
+                const colorMap = {
+                    2: 'lightcoral',
+                    3: 'lightseagreen',
+                    4: 'rebeccapurple',
+                    6: 'steelblue',
+                    8: 'tomato',
+                    10: 'gold', 
+                    12: 'darkorange'
+                };
+
+                var onFinal = false;
+
+                var tooltip = d3.select("#tooltip");
+
+                function calculateAverages(data) {
+                    const averages = {};
+                    const groupedData = d3.group(data, d => d.EngineCylinders);
+                    groupedData.forEach((values, key) => {
+                        const avgCity = d3.mean(values, d => +d.AverageCityMPG);
+                        const avgHighway = d3.mean(values, d => +d.AverageHighwayMPG);
+                        averages[key] = { avgCity, avgHighway };
+                    });
+                    return averages;
+                }
+
+                const averages = calculateAverages(filteredData);
+
+                const annotations = [
+                {
+                    note: { label: "C: " + averages[8].avgCity.toFixed(2) + " H: " + averages[8].avgHighway.toFixed(2), title: "AVG MPG City/Highway" },
+                    x: 355, y: 265, dy: -50, dx: 100
+                },
+                {
+                    note: { label: "C: " + averages[6].avgCity.toFixed(2) + " H: " + averages[6].avgHighway.toFixed(2), title: "AVG MPG City/Highway" },
+                    x: 500, y: 230, dy: -50, dx: 100
+                },
+                {
+                    note: { label: "C: " + averages[4].avgCity.toFixed(2) + " H: " + averages[4].avgHighway.toFixed(2), title: "AVG MPG City/Highway" },
+                    x: 600, y: 180, dy: -50, dx: 100
+                },
+                {
+                    note: { label: "As you can see, engines with fewer cylinders tend to have higher average fuel economies.", title: "Trend" },
+                    x: 450, y: 200, dy: -50, dx: -100
+                },
+                {
+                    note: { label: "C: " + averages[2].avgCity.toFixed(2) + " H: " + averages[2].avgHighway.toFixed(2), title: "AVG MPG City/Highway" },
+                    x: 805, y: 180, dy: -50, dx: 100
+                },
+                {
+                    note: { label: "C: " + averages[3].avgCity.toFixed(2) + " H: " + averages[3].avgHighway.toFixed(2), title: "AVG MPG City/Highway" },
+                    x: 720, y: 110, dy: -50, dx: 100
+                },
+                {
+                    note: { label: "C: " + averages[10].avgCity.toFixed(2) + " H: " + averages[10].avgHighway.toFixed(2), title: "AVG MPG City/Highway" },
+                    x: 310, y: 300, dy: -50, dx: 100
+                },
+                {
+                    note: { label: "C: " + averages[12].avgCity.toFixed(2) + " H: " + averages[12].avgHighway.toFixed(2), title: "AVG MPG City/Highway" },
+                    x: 280, y: 320, dy: -50, dx: 100
+                }
+            ];
+
+                const cylMap = new Map();
+                cylMap.set(8, 0);
+                cylMap.set(6, 1);
+                cylMap.set(4, 2);
+                cylMap.set('all', 3);
+                cylMap.set(2, 4);
+                cylMap.set(3, 5);
+                cylMap.set(10, 6);
+                cylMap.set(12, 7);
+
+                function renderScene(engineCylinders) {
+                    currentCyl = engineCylinders; 
+
+                    let sceneData = filteredData;
+                     
+                    if (engineCylinders !== 'all' & !onFinal) {
+                        sceneData = filteredData.filter(d => +d["EngineCylinders"] === +engineCylinders);
+                    } else if (engineCylinders !== 'all') {
+                        sceneData = filteredData.filter(d => +d["EngineCylinders"] === +engineCylinders);
+                        onFinal = true;
+                    } else {
+                        onFinal = true;
+                    }
+
+                    console.log(currentCyl);
+
+                    svg.selectAll(".annotations").remove();
+                    setTimeout(() => {svg.append("g").call(d3.annotation().annotations([annotations[cylMap.get(currentCyl)]]));
+                    }, 2500);
+                svg.selectAll("circle").remove();
+                    
+                    svg.selectAll("circle").data(sceneData).enter().append("circle")
+                        .attr("class", d => colorClassMap[d["EngineCylinders"]])
+                        .attr("cx", d => scaleX(d["AverageCityMPG"]))
+                        .attr("cy", d => scaleY(d["AverageHighwayMPG"]))
+                        .attr("r", 0)
+                        .on("mouseover", function(event, d) {
+                            const [mouseX, mouseY] = d3.pointer(event);
+                            tooltip.style("opacity", .9)
+                            .style("left", (mouseX + 60) + "px")
+                            .style("top", (mouseY + 60) + "px")
+                            .style("background", colorMap[d["EngineCylinders"]])
+                            .html("Make: " + d['Make'] + "<br>Fuel: " + d['Fuel'] + "<br>Cylinders: " + d['EngineCylinders'] + "<br>C: " + d['AverageCityMPG'] + " H: " + d['AverageHighwayMPG'])
+                        })
+                        .on("mouseout", function() {
+                            tooltip.style("opacity", 0)
+                        })
+                        .transition().duration(3000).delay(100)
+                        .attr("r", d => 2 + +d["EngineCylinders"]);
+                    
+                    if (engineCylinders === 'all') {
+                        document.getElementById("cylinderSelect").style.display = "inline-block";
+                        onFinal = true;
+                        document.getElementById("title").textContent = "All Cylinders";
+                    } else if (engineCylinders !== 'all' & onFinal) {
+                        document.getElementById("cylinderSelect").style.display = "inline-block";
+                        document.getElementById("title").textContent = engineCylinders + ' cylinders'
+                    }
+                    else {
+                        document.getElementById("cylinderSelect").style.display = "none";
+                        document.getElementById("title").textContent = engineCylinders + ' cylinders'
+                    }
+                }
+
+                function updateScene(increment) {
+                    currentIndex = (currentIndex + increment);
+                    console.log(currentIndex);
+                    renderScene(cylinders[currentIndex]);
+                }
+
+                document.getElementById("prev").addEventListener("click", () => {
+                    if (onFinal) {
+                        onFinal = false;
+                        renderScene(4)
+                        
+                    } else if (currentCyl != 8){
+                        updateScene(-1)
+                        onFinal = false;
+                    } else {
+                        renderScene(8);
+                    }
+                });
+                
+                document.getElementById("next").addEventListener("click", () => {
+                    if (currentIndex === cylinders.length - 1) {
+                        document.getElementById("cylinderSelect").value = "all";
+                        renderScene('all');
+                        onFinal = true;
+                    } else {
+                        updateScene(1);
+                        onFinal = false;
+                    }
+                });
+                document.getElementById("cylinderSelect").addEventListener("change", (e) => {
+                    svg.selectAll(".annotations").remove();
+                    if (e.target.value === 'all') {
+                        renderScene(e.target.value);
+                    } else {
+                        renderScene(+e.target.value);
+                    }
+                });
+
+                renderScene(cylinders[currentIndex]);
+            }
+        </script>
+    </body>
+</html>

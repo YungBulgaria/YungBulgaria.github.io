@@ -1,20 +1,70 @@
 <!DOCTYPE html>
-<html>
 <head>
-    <title>
-        There is a circle on this page
-    </title> 
+    <title>Fuel Efficiency Based on Engine Cylinder Count</title>
+    <style>
+        .container { text-align: center; }
+        h1 { font-family: Helvetica; }
+        .row {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .column {
+            flex: 1;
+            margin: 0 10px;
+        }
+        .main-paragraph {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .img-circle { border-radius: 1000px; }
+        .button { text-align: center; margin-top: 50px; }
+        button { padding: 10px 20px; margin: 5px; font-size: 16px; }
+        .source {text-align: left; margin-top: 60px; }
+    </style>
 </head>
-<h1>
-    Welcome to Mick's Web Page!
-</h1>
 <body>
-    <svg width = '200' height = '200'>
-        <circle cx = '100' cy = '100' r = '50' fill = 'red' />
-    </svg>
-
-<button onclick="window.location.href='second.html'"> Go to second page </button>
-<button onclick="window.location.href='third.html'"> Go to third page </button>
-
+    <div class="container">
+        <h1>Fuel Efficiency Based on Engine Cylinder Count</h1>
+        <div class="row">
+            <div class="column">
+                <h2>8 Cylinders</h2>
+                <p>The most powerful of the 3 most common engine types. 
+                    The 8 cylinder engine can be seen in many muscle, sports, and even super cars.
+                </p>
+                <img src="8cylinder.jpeg" class="img-circle" width="400" height="300">
+            </div>
+            <div class="column">
+                <h2>6 Cylinders</h2>
+                <p>An upgrade to the 4 cylinder engine usually found in mid-size sedans and suvs. 
+                    The 6 cylinder engine has more power than the 4 cylinder engine while having better fuel economy than 
+                        the 8 cylinder engine. </p>
+                <img src="6cylinder.jpeg" class="img-circle" width="400" height="300">
+            </div>
+            <div class="column">
+                <h2>4 Cylinders</h2>
+                <p>The most common engine cylinder count in most small to mid-size cars today. 
+                    The 4 cylinder engine has the best fuel economy of the 3 most common engine types 
+                        while also having the least power. </p>
+                <img src="4cylinder.webp" class="img-circle" width="350" height="300">
+            </div>
+        </div>
+        <div class="main-paragraph">
+            <h3>Generally, an engine with more cylinders can produce more power. 
+                Most cars on the road today have 4  or 6 cylinders, but why is this the case? 
+                Well, while having more power can be nice, engines that generate more power consume fuel at a higher rate. 
+                For this reason and a few others, the 4 cylinder engine as well as the 6 cylinder engine have become the most common in our society today. 
+                To illustrate this point, this martini glass narrative visualization will guide you through the fuel 
+                efficiency of the 3 most common engine cylinder counts. </h3>
+        </div>
+        <div class="button">
+            <button onclick="window.location.href='final.html'"> Begin </button>
+        </div>
+        <div> 
+            <p class="source">
+                Data Source: https://flunky.github.io/cars2017.csv
+            </p>
+        </div>
+    </div>
 </body>
 </html>
